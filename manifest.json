@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "AI Bookmark Manager",
+  "short_name": "AI Bookmarks",
+  "version": "1.0.0",
+  "description": "Smart bookmark organization powered by Chrome's built-in AI. Private, fast, and works offline.",
+  "action": {
+    "default_title": "AI Bookmarks",
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": [
+    "bookmarks",
+    "storage",
+    "contextMenus",
+    "sidePanel",
+    "scripting",
+    "activeTab",
+    "clipboardRead"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "service_worker.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "origin_trial_tokens": [
+  "NEW_PROMPT_API_TOKEN",
+  "NEW_WRITER_API_TOKEN",
+  "NEW_PROOFREADER_API_TOKEN"
+],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
+}

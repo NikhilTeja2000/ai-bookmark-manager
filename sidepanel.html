@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Bookmarks</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <img src="assets/icon32.png" alt="icon" width="24" height="24" />
+    <h1>AI Bookmarks</h1>
+    <nav class="tabs">
+      <button class="tab active" data-tab="dash">Dashboard</button>
+      <button class="tab" data-tab="review">Review</button>
+      <button class="tab" data-tab="settings">Settings</button>
+      <button class="tab" data-tab="diag">Diagnostics</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="tab-dash" class="tabview active">
+      <div class="card">
+        <h2>Organize</h2>
+        <p class="muted">Scan, classify, dedupe, and auto-folder your bookmarks. On-device AI.</p>
+        <div class="row">
+          <select id="scope">
+            <option value="current">Current Folder (Smart)</option>
+            <option value="all">All bookmarks</option>
+            <option value="bar">Bookmarks Bar</option>
+            <option value="other">Other Bookmarks</option>
+          </select>
+          <label class="switch"><input id="autoRename" type="checkbox" checked><span>Auto-rename</span></label>
+        </div>
+        <div class="row">
+          <label class="switch" title="When enabled, shows what would happen without actually moving bookmarks">
+            <input id="dryRun" type="checkbox">
+            <span>Dry Run (Preview Only)</span>
+          </label>
+        </div>
+        <div id="scope-info" class="scope-info" style="display: none;">
+          <span id="scope-description">Will organize current folder</span>
+        </div>
+        <div class="row">
+          <label class="slider">Confidence ≥ <span id="thVal">0.90</span>
+            <input id="threshold" type="range" min="0.5" max="0.98" step="0.01" value="0.90">
+          </label>
+        </div>
+        <div class="row">
+          <button id="btn-organize" class="btn primary">🤖 Organize</button>
+          <button id="btn-stop" class="btn" style="display: none;">⏹️ Stop</button>
+          <button id="btn-resume" class="btn" style="display: none;">▶️ Resume</button>
+        </div>
+        <div class="row">
+          <button id="btn-undo" class="btn">↶ Undo Last</button>
+          <button id="btn-reset" class="btn danger">🔄 Reset All</button>
+          <button id="btn-clear-data" class="btn">🧹 Clear Data</button>
+        </div>
+        <div class="row">
+          <button id="btn-open-bookmarks" class="btn">📂 Open Bookmarks</button>
+        </div>
+        <div id="ai-progress-container"></div>
+        <div id="classification-progress" style="display: none;">
+          <div class="progress-info">
+            <div class="progress-stats">
+              <span id="batch-info">Batch 1/10</span>
+              <span id="time-remaining">~2 min remaining</span>
+            </div>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar">
+              <div id="classification-progress-fill" class="progress-fill"></div>
+            </div>
+            <div id="classification-progress-text" class="progress-percent">0%</div>
+          </div>
+        </div>
+        <pre id="status" class="output"></pre>
+      </div>
+
+      <div class="card kpis">
+        <h2>Counters</h2>
+        <div class="stats">
+          <div class="stat"><div class="kpi" id="k-auto">0</div><div class="lbl">Auto</div></div>
+          <div class="stat"><div class="kpi" id="k-review">0</div><div class="lbl">Review</div></div>
+          <div class="stat"><div class="kpi" id="k-skip">0</div><div class="lbl">Skipped</div></div>
+          <div class="stat"><div class="kpi" id="k-dup">0</div><div class="lbl">Duplicates</div></div>
+          <div class="stat"><div class="kpi" id="k-err">0</div><div class="lbl">Errors</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-review" class="tabview">
+      <div class="card">
+        <h2>Needs Review</h2>
+        <table id="reviewTable">
+          <thead><tr><th>Title</th><th>URL</th><th>Suggested</th><th>Conf.</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-settings" class="tabview">
+      <div class="card">
+        <h2>Settings</h2>
+        <div class="row">
+          <label>Folder strategy
+            <select id="folderStrategy">
+              <option value="simple">Simple (2 levels max)</option>
+              <option value="detailed">Detailed (3+ levels)</option>
+              <option value="domain">By Domain</option>
+              <option value="flat">Flat (minimal folders)</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="switch"><input id="autoNew" type="checkbox"><span>Auto-organize newly saved bookmarks</span></label>
+        </div>
+        <div class="row">
+          <button id="btn-save-settings" class="btn primary">💾 Save Settings</button>
+        </div>
+        <pre id="settingsStatus" class="output"></pre>
+      </div>
+    </section>
+
+    <section id="tab-diag" class="tabview">
+      <div class="card">
+        <h2>Diagnostics</h2>
+        <p class="muted">Verify API availability and run a sample classification.</p>
+        <div class="row badges" id="apiBadges"></div>
+        <div class="row">
+          <button id="btn-run-checks" class="btn">🔍 Run Checks</button>
+          <button id="btn-sample-classify" class="btn">🧪 Test Classify</button>
+        </div>
+        <pre id="diagLog" class="output"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">🔒 On-device AI (Gemini Nano) • No server calls • Complete privacy</footer>
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

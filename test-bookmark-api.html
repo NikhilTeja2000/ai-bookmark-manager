@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bookmark API Test</title>
+    <style>
+        body { font-family: system-ui; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .success { background: #e8f5e8; }
+        .error { background: #ffe8e8; }
+    </style>
+</head>
+<body>
+    <h1>Chrome Bookmark API Test</h1>
+    <button onclick="runTests()">Run Tests</button>
+    <div id="results"></div>
+
+    <script>
+        async function runTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '';
+            
+            const tests = [
+                {
+                    name: 'Get Bookmark Tree',
+                    test: async () => {
+                        const tree = await chrome.bookmarks.getTree();
+                        return `Found ${tree.length} root nodes`;
+                    }
+                },
+                {
+                    name: 'Get Bookmarks Bar (ID: 1)',
+                    test: async () => {
+                        const bar = await chrome.bookmarks.get('1');
+                        return `Bookmarks Bar: "${bar[0].title}"`;
+                    }
+                },
+                {
+                    name: 'Get Other Bookmarks (ID: 2)',
+                    test: async () => {
+                        const other = await chrome.bookmarks.get('2');
+                        return `Other Bookmarks: "${other[0].title}"`;
+                    }
+                },
+                {
+                    name: 'Create Test Folder',
+                    test: async () => {
+                        const folder = await chrome.bookmarks.create({
+                            title: 'API_TEST_FOLDER',
+                            parentId: '1'
+                        });
+                        // Clean up immediately
+                        await chrome.bookmarks.remove(folder.id);
+                        return `Created and removed test folder: ${folder.id}`;
+                    }
+                },
+                {
+                    name: 'Search for Bookmarks',
+                    test: async () => {
+                        const results = await chrome.bookmarks.search('');
+                        return `Found ${results.length} total bookmarks`;
+                    }
+                }
+            ];
+            
+            for (const test of tests) {
+                const div = document.createElement('div');
+                div.className = 'test';
+                
+                try {
+                    const result = await test.test();
+                    div.className += ' success';
+                    div.innerHTML = `✅ <strong>${test.name}</strong>: ${result}`;
+                } catch (error) {
+                    div.className += ' error';
+                    div.innerHTML = `❌ <strong>${test.name}</strong>: ${error.message}`;
+                }
+                
+                results.appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html>

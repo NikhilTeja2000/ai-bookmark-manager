@@ -1,0 +1,1 @@
+let _r; export async function ensureRewriter(){ const a=await Rewriter.availability?.(); if(a==='unavailable') throw new Error('Rewriter unavailable'); _r=_r||await Rewriter.create(); return _r; }
